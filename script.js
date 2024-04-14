@@ -111,32 +111,6 @@ function displayPokemonSprites(data) {
         <p>Back Shiny</p>
       </div>
     </div>
-    <div class="sprite-row">
-      ${data.sprites.front_female ? `
-      <div class="sprite-item">
-        <img src="${data.sprites.front_female}" alt="${data.name} front female">
-        <p>Front Female</p>
-      </div>
-      ` : ''}
-      ${data.sprites.back_female ? `
-      <div class="sprite-item">
-        <img src="${data.sprites.back_female}" alt="${data.name} back female">
-        <p>Back Female</p>
-      </div>
-      ` : ''}
-      ${data.sprites.front_shiny_female ? `
-      <div class="sprite-item">
-        <img src="${data.sprites.front_shiny_female}" alt="${data.name} front shiny female">
-        <p>Front Shiny Female</p>
-      </div>
-      ` : ''}
-      ${data.sprites.back_shiny_female ? `
-      <div class="sprite-item">
-        <img src="${data.sprites.back_shiny_female}" alt="${data.name} back shiny female">
-        <p>Back Shiny Female</p>
-      </div>
-      ` : ''}
-    </div>
   `;
 }
 
@@ -145,8 +119,11 @@ function fetchPokemonDetails(pokemonName) {
     .then(response => response.json())
     .then(data => {
       const pokemonDetails = document.getElementById("pokemon-details");
+      const types = data.types.map(type => type.type.name).join(', ');
+
       pokemonDetails.innerHTML = `
         <h2>${data.name}</h2>
+        <p>Type: ${types}</p>
         <div id="pokemon-sprites"></div>
         <h3>Moves:</h3>
         <ul>
