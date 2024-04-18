@@ -121,20 +121,31 @@ function fetchPokemonDetails(pokemonName) {
       const pokemonDetails = document.getElementById("pokemon-details");
       const types = data.types.map(type => type.type.name).join(', ');
 
-      pokemonDetails.innerHTML = `
-        <h2>${data.name}</h2>
-        <p>Type: ${types}</p>
-        <div id="pokemon-sprites"></div>
-        <h3>Moves:</h3>
-        <ul>
-          ${data.moves.map(move => `<li>${move.move.name}</li>`).join('')}
-        </ul>
-        <h3>Base Stats:</h3>
-        <ul>
-          ${data.stats.map(stat => `<li>${stat.stat.name}: ${stat.base_stat}</li>`).join('')}
-        </ul>
-      `;
-      displayPokemonSprites(data);
+      // Fetch move details for each move the Pokémon can learn
+      const movePromises = data.moves.map(move => fetch(move.move.url).then(response => response.json()));
+
+      Promise.all(movePromises)
+        .then(moveDetails => {
+          const moveList = moveDetails.map(move => `${move.name} (Power: ${move.power || 'N/A'})`).join('</li><li>');
+
+          pokemonDetails.innerHTML = `
+            <h2>${data.name}</h2>
+            <p>Type: ${types}</p>
+            <div id="pokemon-sprites"></div>
+            <h3>Moves:</h3>
+            <ul>
+              <li>${moveList}</li>
+            </ul>
+            <h3>Base Stats:</h3>
+            <ul>
+              ${data.stats.map(stat => `<li>${stat.stat.name}: ${stat.base_stat}</li>`).join('')}
+            </ul>
+          `;
+          displayPokemonSprites(data);
+        })
+        .catch(error => {
+          console.error('Error fetching move details:', error);
+        });
     })
     .catch(error => {
       console.error('Error fetching Pokémon data:', error);
